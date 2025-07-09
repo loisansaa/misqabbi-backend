@@ -1,14 +1,11 @@
-const { initializeApp, cert } = require("firebase-admin/app");
+const { initializeApp, applicationDefault } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
-
-const path = require("path");
-
-// Load service account key
-const serviceAccount = require(path.resolve("firebase-admin.json"));
+require("dotenv").config();
 
 const app = initializeApp({
-  credential: cert(serviceAccount),
+  credential: applicationDefault(),
+  projectId: process.env.PROJECT_ID,
 });
 
 const db = getFirestore(app);
