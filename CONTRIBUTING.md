@@ -7,7 +7,7 @@ Thanks for your interest in contributing to **Misqabbi Store**! We appreciate yo
 ## 🚀 Getting Started
 
 1. **Report Issues**  
-   Use GitHub Issues to report bugs, suggest enhancements, or ask questions.
+   Use [GitHub Issues](https://github.com/anorme/misqabbi-store/issues)to report bugs, suggest enhancements, or ask questions.
 
 2. **Fork the Repository**  
    Clone your fork and create a new branch:  
