@@ -32,6 +32,7 @@ Built with Node.js, Express, and Firebase Admin SDK, this backend is designed fo
 5. Create a `.env` file:
    ```env
    PORT=5000
+   GOOGLE_APPLICATION_CREDENTIALS="path to your firebase-admin.json" # Use backslashes on Windows
    ```
 
 ---
