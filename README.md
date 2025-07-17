@@ -4,35 +4,35 @@
 
 This is the backend for the **Misqabbi Store**, an e-commerce platform that powers a women-owned fashion brand specializing in made-to-measure pieces designed exclusively for women.
 
-Built with Node.js, Express, and Firebase Admin SDK, this backend is designed for scalability, security, and collaboration.
+Built with Node.js, Express and MongoDB, this backend is designed for scalability, security, and collaboration.
 
 ---
 
 ## ⚙️ Installation
 
 1. Clone the repository:
+
    ```bash
-   git clone https://github.com/anorme/misqabbi-store.git
+   git clone https://github.com/anorme/misqabbi-backend.git
    ```
+
 2. Navigate into the project directory:
+
    ```bash
-   cd misqabbi-store
+   cd misqabbi-backend
    ```
+
 3. Install dependencies:
 
    ```bash
    npm install
-   # or
-   yarn install
    ```
 
-4. Add your Firebase Admin SDK credentials:  
-   Place your `firebase-admin.json` file in the root directory (this file is ignored by Git).
-
-5. Create a `.env` file:
+4. Create a `.env` file in the root directory:
    ```env
    PORT=5000
-   GOOGLE_APPLICATION_CREDENTIALS="path to your firebase-admin.json" # Use backslashes on Windows
+   MONGO_URI="MongoDB Atlas connection string"
+   JWT_SECRET="JWT secret"
    ```
 
 ---
@@ -53,36 +53,67 @@ npm start
 
 ---
 
-## 🔐 RBAC Middleware (In Progress)
+## 🔐 Authentication & RBAC
 
-We're scaffolding role-based access control using Firebase Admin SDK.
+Authentication is handled using Passport.js and JWT. Role-based access control is enforced via middleware.
 
-### Middleware to Implement
-
-- `verifyToken`: Verifies Firebase ID tokens and attaches user info to `req.user`
-- `checkAdmin`: Checks Firestore for user role and allows access if `role === 'admin'`
-
-### How to Contribute
-
-- Follow the TODOs in each middleware file:
-  - `src/middleware/auth.middleware.js`
-  - `src/middleware/rbac.middleware.js`
-- Use `auth.verifyIdToken()` to decode tokens
-- Use `db.collection('users').doc(uid)` to fetch user roles
-- Test with the `/api/admin/dashboard` route
-
-Once implemented, we’ll review and compare solutions before merging.
+> For migration progress and implementation details, see [Migration Issue #3](https://github.com/anorme/misqabbi-store/issues/3)
 
 ---
 
 ## 📦 Routes Overview
 
-| Endpoint               | Method | Access     | Description                     |
-| ---------------------- | ------ | ---------- | ------------------------------- |
-| `/api/admin/dashboard` | GET    | Admin only | Protected admin dashboard route |
-| `/api/orders`          | GET    | Auth only  | Get all orders (TODO)           |
-| `/api/orders/:id`      | GET    | Auth only  | Get order by ID (TODO)          |
-| `/api/orders`          | POST   | Auth only  | Create new order (TODO)         |
+### 👤 User Endpoints
+
+| Endpoint        | Method | Access    | Description                         |
+| --------------- | ------ | --------- | ----------------------------------- |
+| `/api/users/me` | GET    | Auth only | Get current user's profile(TODO)    |
+| `/api/users/me` | PUT    | Auth only | Update current user's profile(TODO) |
+
+> These endpoints use JWT-based authentication to identify the user via `req.user`.
+
+---
+
+### 🛍️ Product Endpoints
+
+| Endpoint                                  | Method | Access | Description                                  |
+| ----------------------------------------- | ------ | ------ | -------------------------------------------- |
+| `/api/products`                           | GET    | Public | Get all products(TODO)                       |
+| `/api/products/:id`                       | GET    | Public | Get product by ID(TODO)                      |
+| `/api/products?category=...`              | GET    | Public | Filter products by category(TODO)            |
+| `/api/products?search=...`                | GET    | Public | Search products by name or description(TODO) |
+| `/api/products?priceMin=...&priceMax=...` | GET    | Public | Filter products by price range(TODO)         |
+
+> These endpoints support flexible query parameters for filtering and search.
+
+---
+
+### 📦 Order Endpoints
+
+| Endpoint          | Method | Access    | Description             |
+| ----------------- | ------ | --------- | ----------------------- |
+| `/api/orders`     | GET    | Auth only | Get all orders (TODO)   |
+| `/api/orders/:id` | GET    | Auth only | Get order by ID (TODO)  |
+| `/api/orders`     | POST   | Auth only | Create new order (TODO) |
+
+---
+
+### 🛡️ Admin Endpoints
+
+| Endpoint                  | Method | Access     | Description                     |
+| ------------------------- | ------ | ---------- | ------------------------------- |
+| `/api/admin/dashboard`    | GET    | Admin only | Protected admin dashboard route |
+| `/api/admin/products`     | POST   | Admin only | Create new product (TODO)       |
+| `/api/admin/products/:id` | PUT    | Admin only | Update product (TODO)           |
+| `/api/admin/products/:id` | DELETE | Admin only | Delete product (TODO)           |
+
+---
+
+## 🧠 Notes
+
+- All protected routes require a valid JWT in the `Authorization` header.
+- Admin routes require the user to have `role: 'admin'`.
+- Query parameters for `/products` can be combined for advanced filtering.
 
 ---
 
@@ -91,7 +122,7 @@ Once implemented, we’ll review and compare solutions before merging.
 We love contributions! To get started, please read our  
 [Contributing Guide](CONTRIBUTING.md) for coding standards, commit conventions, and submission steps.
 
-If you're collaborating on the RBAC feature, check the section above for implementation notes and TODOs.
+If you're collaborating on the RBAC or authentication features, check the section above for implementation notes and TODOs.
 
 ---
 
