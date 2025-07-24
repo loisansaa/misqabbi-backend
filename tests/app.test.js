@@ -1,12 +1,12 @@
 /* eslint-disable no-undef */
-jest.mock("../src/config/firebase.config");
+import supertest from "supertest";
+import app from "../src/app.js";
 
-const request = require("supertest");
-const app = require("../src/app");
+const request = supertest(app);
 
 describe("Health Check", () => {
   it("should return 200 OK with a welcome message", async () => {
-    const res = await request(app).get("/");
+    const res = await request.get("/");
     expect(res.statusCode).toBe(200);
     expect(res.body).toHaveProperty("message", "Misqabbi backend is live");
   });

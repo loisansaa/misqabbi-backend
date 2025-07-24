@@ -1,12 +1,18 @@
-const express = require("express");
-const helmet = require("helmet");
-const morgan = require("morgan");
+import express from "express";
+import helmet from "helmet";
+import morgan from "morgan";
 
-const adminRoutes = require("./routes/orders.routes");
-const orderRoutes = require("./routes/admin.routes");
-const { errorHandler } = require("./middleware");
+import "./config/passport.js";
+
+import authRoutes from "./routes/auth.routes.js";
+import orderRoutes from "./routes/orders.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
+import { errorHandler } from "./middleware/index.js";
 
 const app = express();
+
+// TODO: Move API_PREFIX to environment config for flexibility across environments
+const API_PREFIX = "/api/v1";
 
 app.use(helmet());
 app.use(morgan("dev"));
@@ -16,10 +22,11 @@ app.get("/", (req, res) => {
   res.status(200).json({ message: "Misqabbi backend is live" });
 });
 
-// Mount routes (to be implemented)
-app.use("/api/orders", adminRoutes);
-app.use("/api/admin", orderRoutes);
+// Mount versioned routes
+app.use(`${API_PREFIX}/auth`, authRoutes);
+app.use(`${API_PREFIX}/orders`, orderRoutes);
+app.use(`${API_PREFIX}/admin`, adminRoutes);
 
 app.use(errorHandler);
 
-module.exports = app;
+export default app;

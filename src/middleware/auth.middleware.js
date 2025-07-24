@@ -1,30 +1,54 @@
-// Middleware: verifyToken
-// Purpose:  Authenticate requests using Firebase ID tokens
+import { verifyToken } from "../services/jwtService.js";
+import { findUserById } from "../models/users.model.js";
+import logger from "../config/logger.js";
 
-const { auth } = require("../config/firebase.config");
+/**
+ * Auth middleware to validate JWT from Authorization header.
+ *
+ * Expected format: 'Bearer <token>'
+ * Attaches verified user to req.user
+ *
+ * @throws {401} If token is missing or malformed
+ * @throws {403} If token is invalid or expired
+ */
+async function authenticateToken(req, res, next) {
+  const authHeader = req.headers?.authorization;
 
-async function verifyToken(req, res, next) {
-  // Expecting Authorization header in format: 'Bearer <idToken>'
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (!authHeader?.startsWith("Bearer ")) {
+    logger.warn("[auth.middleware] Missing or malformed Authorization header");
     return res
       .status(401)
-      .json({ message: "No token provided or format is incorrect" });
+      .json({ message: "Missing or malformed Authorization header" });
   }
 
-  const idToken = authHeader.split("Bearer ")[1];
-  // Verify token using Firebase Admin SDK and attach identity info
+  const token = authHeader.split(" ")[1];
+
   try {
-    const decodedToken = await auth.verifyIdToken(idToken);
-    // Attach decoded user info to req.user
-    req.user = decodedToken; // Includes uid, email, etc.
+    const decoded = verifyToken(token);
+
+    const user = await findUserById(decoded.id);
+    if (!user) return res.status(401).json({ message: "User not found" });
+    req.user = user;
     next();
   } catch (error) {
-    // Handle missing/invalid token and send appropriate response
-    console.error("Token verification failed:", error.message);
+    logger.error(
+      `[auth.middleware] Token verification failed: ${error.message}`
+    );
     return res.status(403).json({ message: "Invalid or expired token" });
   }
 }
 
-module.exports = verifyToken;
+/**
+ * Middleware to restrict access to admin-only routes.
+ *
+ * Assumes req.user is populated by authentication middleware
+ *
+ * @throws {403} If user lacks admin privileges
+ */
+function checkAdmin(req, res, next) {
+  if (req.user?.role !== "admin")
+    return res.status(403).json({ message: "Access denied: Admins only!" });
+  next();
+}
+
+export { authenticateToken, checkAdmin };

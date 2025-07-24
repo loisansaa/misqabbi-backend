@@ -1,20 +1,26 @@
 # Middleware Summary
 
-## `verifyToken`
+This folder contains authentication and authorization middleware for the Misqabbi backend, now powered by JWT and MongoDB.
 
-**Purpose:** Authenticate requests using Firebase ID tokens.
+---
+
+## `authenticateToken`
+
+**Purpose:** Authenticate requests using JWT tokens.
 
 **How it works:**
 
-- Expects header: `Authorization: Bearer <idToken>`
-- Verifies the token via Firebase Admin SDK
-- Attaches decoded user info to `req.user`
-- Rejects requests with missing or invalid tokens
+- Expects header: `Authorization: Bearer <token>`
+- Verifies the token using the server's JWT secret
+- Decodes payload to extract user ID
+- Fetches full user document from MongoDB
+- Attaches user object to `req.user`
+- Rejects requests with missing, malformed, or expired tokens
 
 **Use:** Place before protected routes:
 
 ```js
-app.get("/secure", verifyToken, handler);
+app.get("/secure", authenticateToken, handler);
 ```
 
 ---
@@ -25,15 +31,25 @@ app.get("/secure", verifyToken, handler);
 
 **How it works:**
 
-- Reads UID from `req.user` (set by `verifyToken`)
-- Fetches user’s Firestore record
-- Checks if `role === 'admin'`
-- Blocks access if not admin
+- Assumes `req.user` is populated by `authenticateToken`
+- Checks if `req.user.role === 'admin'`
+- Blocks access if role is not `'admin'`
 
-**Use:** Chain after `verifyToken`:
+**Use:** Chain after `authenticateToken`:
 
 ```js
-app.get("/admin", verifyToken, checkAdmin, handler);
+app.get("/admin", authenticateToken, checkAdmin, handler);
 ```
 
 ---
+
+## Notes
+
+- Consider limiting selected fields from the user document for performance
+- Replace `console.error` with structured logging in production
+- Future enhancements may include role hierarchy or scoped permissions
+
+```
+
+---
+```

@@ -1,9 +1,4 @@
-const verifyToken = require("./auth.middleware");
-const errorHandler = require("./error.middleware");
-const checkAdmin = require("./rbac.middleware");
+import { authenticateToken, checkAdmin } from "./auth.middleware.js";
+import errorHandler from "./error.middleware.js";
 
-module.exports = {
-  verifyToken,
-  checkAdmin,
-  errorHandler,
-};
+export { authenticateToken, checkAdmin, errorHandler };

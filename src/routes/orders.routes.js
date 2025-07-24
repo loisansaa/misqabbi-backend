@@ -1,8 +1,9 @@
-const express = require("express");
+import express from "express";
+
 const router = express.Router();
 
-// TODO: Import verifyToken middleware when ready
-// const verifyToken = require('../middleware/auth.middleware');
+// TODO: Import authenticateToken middleware when ready
+// const authenticateToken = require('../middleware/auth.middleware');
 
 // TODO: Import orders controller functions when implemented
 // const { createOrder, getOrders, getOrderById } = require('../controllers/orders.controller');
@@ -12,7 +13,7 @@ const router = express.Router();
 // @access  Protected
 router.post(
   "/",
-  /* verifyToken, */ (req, res) => {
+  /* authenticateToken, */ (req, res) => {
     // TODO: Implement createOrder controller
     return res
       .status(501)
@@ -25,7 +26,7 @@ router.post(
 // @access  Protected
 router.get(
   "/",
-  /* verifyToken, */ (req, res) => {
+  /* authenticateToken, */ (req, res) => {
     // TODO: Implement getOrders controller
     return res.status(501).json({ message: "Get orders not yet implemented" });
   }
@@ -36,7 +37,7 @@ router.get(
 // @access  Protected
 router.get(
   "/:id",
-  /* verifyToken, */ (req, res) => {
+  /* authenticateToken, */ (req, res) => {
     // TODO: Implement getOrderById controller
     return res
       .status(501)
@@ -44,4 +45,4 @@ router.get(
   }
 );
 
-module.exports = router;
+export default router;
