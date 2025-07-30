@@ -5,7 +5,6 @@ import logger from "../config/logger.js";
 import {
   EMAIL_REGEX,
   isPasswordValidOrGoogleUser,
-  STRONG_PASSWORD_REGEX,
 } from "../utils/validators.js";
 
 /**
@@ -61,10 +60,13 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
-      match: STRONG_PASSWORD_REGEX,
+      required: function () {
+        return !this.googleId;
+      },
       validate: {
         validator: function (value) {
-          return isPasswordValidOrGoogleUser(value, this);
+          const isNewOrChanged = this.isModified("password");
+          return !isNewOrChanged || isPasswordValidOrGoogleUser(value, this);
         },
         message: "Password required for local accounts",
       },
@@ -95,7 +97,7 @@ userSchema.pre("save", async function (next) {
   try {
     const shouldHash = this.isModified("password") && this.password;
     if (!shouldHash) return next();
-    this.password = bcrypt.hash(this.password, 10);
+    this.password = await bcrypt.hash(this.password, 10);
     next();
   } catch (error) {
     logger.error(`[users.mongo] Error hashing password: ${error.message}`);
