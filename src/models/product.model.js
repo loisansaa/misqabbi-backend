@@ -1,4 +1,4 @@
-import Product from "./products.mongo.js";
+import Product from "./product.mongo.js";
 import logger from "../config/logger.js";
 
 /**
@@ -25,6 +25,44 @@ async function getAllPublishedProducts() {
   } catch (error) {
     logger.error(
       `[products.model] Error fetching published products: ${error.message}`
+    );
+    throw error;
+  }
+}
+
+/**
+ * @desc    Retrieve the count of all products where isPublished is true
+ * @returns {Promise<Number>} Count of published product documents
+ */
+async function countPublishedProducts() {
+  try {
+    return await Product.countDocuments({ isPublished: true });
+  } catch (error) {
+    logger.error(
+      `[products.model] Error counting published products: ${error.message}`
+    );
+    throw error;
+  }
+}
+
+/**
+ * @desc    Retrieve a paginated set of published products
+ * @param   {Number} page - Page number of results to return
+ * @param   {Number} limit - Number of results per page
+ * @returns {Promise<Array>} Array of published product documents
+ * @throws  {Error} When there is an error fetching the paginated products
+ */
+async function getPaginatedPublishedProducts(page, limit) {
+  try {
+    const startIndex = (page - 1) * limit;
+
+    return await Product.find({ isPublished: true })
+      .sort({ createdAt: -1 })
+      .skip(startIndex)
+      .limit(limit);
+  } catch (error) {
+    logger.error(
+      `[products.model] Error fetching paginated products: ${error.message}`
     );
     throw error;
   }
@@ -102,6 +140,8 @@ async function deleteProduct(id) {
 export {
   getAllProducts,
   getAllPublishedProducts,
+  getPaginatedPublishedProducts,
+  countPublishedProducts,
   getProductById,
   createProduct,
   updateProduct,
