@@ -9,9 +9,11 @@ import { validateOrder } from "../middleware/validator.middleware.js";
 
 const router = express.Router();
 
-// @route   POST /api/orders
-// @desc    Create a new order
-// @access  Protected
+/**
+ * @route   POST/orders
+ * @desc    Creates a new order
+ * @access  Protected
+ */
 router.post("/checkout", validateOrder, authenticateToken, createOrder);
 
 /**
